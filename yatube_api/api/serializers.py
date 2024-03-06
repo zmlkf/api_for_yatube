@@ -1,28 +1,7 @@
-import base64
-
-from django.core.files.base import ContentFile
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
 from posts.models import Comment, Follow, Group, Post, User
-
-
-class Base64ImageField(serializers.ImageField):
-    """
-    Поле для обработки изображений в формате base64.
-    При загрузке изображения в формате base64, данное поле
-    декодирует изображение и сохраняет его как объект ContentFile.
-    Аргументы:
-    - data: Строка, представляющая изображение в формате base64.
-    Возвращает объект ContentFile с декодированным изображением.
-    """
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            ext = format.split('/')[-1]
-            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-
-        return super().to_internal_value(data)
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -31,11 +10,8 @@ class PostSerializer(serializers.ModelSerializer):
     Позволяет создавать, обновлять и просматривать посты.
     Поля:
     - author: Автор поста (только чтение).
-    - image: Изображение поста в формате base64 (опционально).
-
     """
     author = SlugRelatedField(slug_field='username', read_only=True)
-    image = Base64ImageField(required=False, allow_null=True)
 
     class Meta:
         fields = '__all__'
@@ -99,12 +75,24 @@ class FollowSerializer(serializers.ModelSerializer):
         fields = ('user', 'following')
         model = Follow
 
-    def validate(self, data):
+    def validate_following(self, value):
         """
-        Проверка данных перед сохранением.
+        Проверка поля following.
         Проверяет, что пользователь не пытается подписаться на самого себя.
         """
-        if self.context['request'].user == data['following']:
+        if self.context['request'].user == value:
             raise serializers.ValidationError(
                 'Нельзя подписаться на самого себя!')
+        return value
+
+    def validate(self, data):
+        """
+        Проверяет, что комбинация значений полей user и following уникальна.
+        """
+        if Follow.objects.filter(
+            user=self.context['request'].user,
+            following=data['following']
+        ).exists():
+            raise serializers.ValidationError('Подписка уже существует.')
+
         return data

@@ -14,7 +14,8 @@ class PostViewSet(viewsets.ModelViewSet):
     """
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = (
+        IsAuthorOrReadOnly, permissions.IsAuthenticatedOrReadOnly)
     pagination_class = pagination.LimitOffsetPagination
 
     def perform_create(self, serializer):
@@ -39,7 +40,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     Реализует методы CRUD для модели Comment
     """
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = (
+        IsAuthorOrReadOnly, permissions.IsAuthenticatedOrReadOnly)
 
     def get_post(self):
         """
