@@ -3,7 +3,7 @@ from rest_framework import permissions
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
     """
-    Редактирование - только для автора.
+    Editing is allowed only for the author.
     """
 
     def has_object_permission(self, request, view, obj):

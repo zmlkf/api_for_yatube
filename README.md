@@ -1,67 +1,52 @@
-# Yatube API
+# YATUBE API
 
-API для социальной сети Yatube, где пользователи могут делиться своими постами, комментировать их и подписываться на других пользователей.
+YATUBE API is a project that provides RESTful APIs for managing posts, comments, groups, and user subscriptions. It's designed to be a backend system without a frontend interface.
 
-## Установка
+## Installation
 
-1. Клонировать репозиторий:
+1. Clone the repository:
 
-```bash
-git clone https://github.com/your_username/api_final_yatube.git
-```
-2. Перейти в директорию проекта
-```bash
-cd api_final_yatube
-```
-3. Установить и активировать виртуальное окружение
+    ```bash
+    git clone git@github.com:zmlkf/api_for_yatube.git
+    ```
 
-```bash
-python -m venv venv
-```
-```bash
-source venv/bin/activate
-```
-```bash
-python -m pip install --upgrade pip
-```
-4. Установить зависимости
-```bash
-pip install -r requirements.txt
-```
-5. Перейти в директорию приложения
-```bash
-cd yatube_api
-```
-6. Выполнить миграции
-```bash
-python manage.py migrate
-```
-7. Запустить сервер
-```bash
-python manage.py runserver
-```
-**После выполнения этих шагов, API будет доступно по адресу http://127.0.0.1:8000/**
+2. Install dependencies:
 
-# Ресурсы API
-```bash
-http://127.0.0.1:8000/redoc/ - Содержит документацию для API Yatube. В документации описано, как должен работаь API. Документация представлена в формате Redoc.
-```
-# Формат данных
-### API возвращает данные в формате JSON.
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-Пример успешного ответа:
+3. Apply migrations:
 
-```bash
-{
-    "username": "user123",
-    "email": "user123@example.com"
-}
-```
-## Автор
-Автор: Roman Zemliakov
+    ```bash
+    python manage.py migrate
+    ```
 
-Email: zemliakovroman97@gmail.com
+4. Run the development server:
 
+    ```bash
+    python manage.py runserver
+    ```
 
+## Usage
 
-Этот `readme.md` предоставляет информацию о установке, использовании и ресурсах API, а также примеры запросов и формата данных. Вы можете дополнить его информацией о других функциях и настройках вашего API.
+### API Endpoints
+
+- `/admin/`: Django admin panel for managing database objects.
+- `/api/`: Base endpoint for API.
+- `/api/v1/posts/`: Endpoint for managing posts.
+- `/api/v1/groups/`: Endpoint for managing groups.
+- `/api/v1/posts/{post_id}/comments/`: Endpoint for managing comments on a specific post.
+- `/api/v1/follow/`: Endpoint for managing user subscriptions.
+
+### Authentication
+
+Authentication is handled using JSON Web Tokens (JWT). To obtain a token, use the `/auth/jwt/create/` endpoint provided by `djoser.urls.jwt` included in the project. Pass your username and password as a JSON payload to this endpoint to receive a token.
+
+### Redoc
+
+Redoc documentation is available at `/redoc/` endpoint, which provides detailed documentation about the available API endpoints, request parameters, and responses.
+
+## Contributors
+
+- **Roman Zemliakov**: [GitHub](https://github.com/zmlkf)

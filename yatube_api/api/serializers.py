@@ -6,22 +6,22 @@ from posts.models import Comment, Follow, Group, Post, User
 
 class PostSerializer(serializers.ModelSerializer):
     """
-    Сериализатор для модели Post.
-    Позволяет создавать, обновлять и просматривать посты.
-    Поля:
-    - author: Автор поста (только чтение).
+    Serializer for the Post model.
+    Allows creating, updating, and viewing posts.
+    Fields:
+    - author: The author of the post (read-only).
     """
     author = SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
-        fields = '__all__'
         model = Post
+        fields = '__all__'
 
 
 class GroupSerializer(serializers.ModelSerializer):
     """
-    Сериализатор для модели Group.
-    Позволяет просматривать информацию о группах.
+    Serializer for the Group model.
+    Allows viewing information about groups.
     """
 
     class Meta:
@@ -31,10 +31,10 @@ class GroupSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     """
-    Сериализатор для модели Comment.
-    Позволяет создавать, обновлять и просматривать комментарии к постам.
-    Поля:
-    - author: Автор комментария (только чтение).
+    Serializer for the Comment model.
+    Allows creating, updating, and viewing comments on posts.
+    Fields:
+    - author: The author of the comment (read-only).
     """
 
     author = serializers.SlugRelatedField(
@@ -42,24 +42,24 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = '__all__'
         model = Comment
+        fields = '__all__'
         read_only_fields = ('post',)
 
 
 class FollowSerializer(serializers.ModelSerializer):
     """
-    Сериализатор для модели Follow.
-    Позволяет создавать и просматривать подписки пользователей.
-    Поля:
-    - user: Пользователь, который подписывается (только чтение).
-    По умолчанию, это значение будет автоматически установлено на
-    текущего пользователя, отправляющего запрос на создание подписки.
+    Serializer for the Follow model.
+    Allows creating and viewing user subscriptions.
+    Fields:
+    - user: The user subscribing (read-only).
+    By default, this value will be automatically set to
+    the current user sending the request to create the subscription.
 
-    - following: Пользователь, на которого подписываются.
-    Это поле представляет пользователя, на которого создается подписка.
-    Параметр queryset=User.objects.all() определяет набор пользователей,
-    среди которых клиент может выбирать для создания подписки.
+    - following: The user being subscribed to.
+    This field represents the user being subscribed to.
+    The parameter queryset=User.objects.all() defines the set of users
+    from which the client can choose to create the subscription.
     """
     user = serializers.SlugRelatedField(
         read_only=True,
@@ -72,22 +72,22 @@ class FollowSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('user', 'following')
         model = Follow
+        fields = ('user', 'following')
         validators = (
             validators.UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
                 fields=('user', 'following'),
-                message='Подписка уже существует.'
+                message='Subscription already exists.'
             ),
         )
 
     def validate_following(self, following):
         """
-        Проверка поля following.
-        Проверяет, что пользователь не пытается подписаться на самого себя.
+        Validation for the following field.
+        Checks that the user is not trying to subscribe to themselves.
         """
         if self.context['request'].user == following:
             raise serializers.ValidationError(
-                'Нельзя подписаться на самого себя!')
+                'Cannot subscribe to yourself!')
         return following

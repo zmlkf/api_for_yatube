@@ -9,8 +9,8 @@ from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
 
 class PostViewSet(viewsets.ModelViewSet):
     """
-    Вьюсет для работы с постами.
-    Реализует методы CRUD для модели Post
+    Viewset for working with posts.
+    Implements CRUD methods for the Post model.
     """
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -20,15 +20,15 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """
-        Создает новый пост с указанием текущего пользователя в качестве автора.
+        Creates a new post with the current user as the author.
         """
         serializer.save(author=self.request.user)
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Вьюсет для просмотра групп.
-    Позволяет только чтение групп для всех пользователей
+    Viewset for viewing groups.
+    Allows only reading groups for all users.
     """
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
@@ -36,8 +36,8 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     """
-    Вьюсет для работы с комментариями к постам.
-    Реализует методы CRUD для модели Comment
+    Viewset for working with comments on posts.
+    Implements CRUD methods for the Comment model.
     """
     serializer_class = CommentSerializer
     permission_classes = (
@@ -45,20 +45,20 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_post(self):
         """
-        Получает объект поста по его идентификатору из URL.
+        Gets the post object by its ID from the URL.
         """
         return get_object_or_404(Post, id=self.kwargs.get('post_id'))
 
     def get_queryset(self):
         """
-        Получает все комментарии для конкретного поста.
+        Gets all comments for a specific post.
         """
         return self.get_post().comments.all()
 
     def perform_create(self, serializer):
         """
-        Создает новый комментарий к посту
-        с указанием текущего пользователя в качестве автора.
+        Creates a new comment on the post
+        with the current user as the author.
         """
         serializer.save(author=self.request.user, post=self.get_post())
 
@@ -67,10 +67,10 @@ class FollowViewSet(mixins.ListModelMixin,
                     mixins.CreateModelMixin,
                     viewsets.GenericViewSet):
     """
-    Вьюсет для работы с подписчиками.
-    Позволяет просматривать подписки пользователя.
-    При создании новой подписки автоматически
-    устанавливает текущего пользователя как подписчика.
+    Viewset for working with followers.
+    Allows viewing user subscriptions.
+    When creating a new subscription, automatically
+    sets the current user as the follower.
     """
     serializer_class = FollowSerializer
     permission_classes = (permissions.IsAuthenticated,)
@@ -79,12 +79,12 @@ class FollowViewSet(mixins.ListModelMixin,
 
     def get_queryset(self):
         """
-        Получает список подписок текущего пользователя.
+        Gets the list of subscriptions for the current user.
         """
         return self.request.user.follower.all()
 
     def perform_create(self, serializer):
         """
-        Создает новую подписку от имени текущего пользователя.
+        Creates a new subscription on behalf of the current user.
         """
         serializer.save(user=self.request.user)

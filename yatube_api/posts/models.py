@@ -6,11 +6,11 @@ User = get_user_model()
 
 class Group(models.Model):
     """
-    Модель для группы постов.
-    Поля:
-        title: Заголовок группы.
-        slug: Уникальный идентификатор группы.
-        description: Описание группы.
+    Model for a group of posts.
+    Fields:
+        title: Group title.
+        slug: Unique group identifier.
+        description: Group description.
     """
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
@@ -22,16 +22,16 @@ class Group(models.Model):
 
 class Post(models.Model):
     """
-    Модель для поста.
-    Поля:
-    - text: Текст поста.
-    - pub_date: Дата и время публикации поста.
-    - author: Автор поста (внешний ключ на модель пользователя).
-    - image: Изображение поста.
-    - group: Группа, к которой относится пост (внешний ключ на модель группы).
+    Model for a post.
+    Fields:
+    - text: Post text.
+    - pub_date: Date and time of post publication.
+    - author: Post author (foreign key to the user model).
+    - image: Post image.
+    - group: Group to which the post belongs (foreign key to the group model).
     """
     text = models.TextField()
-    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
+    pub_date = models.DateTimeField('Publication date', auto_now_add=True)
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='posts')
     image = models.ImageField(
@@ -50,12 +50,12 @@ class Post(models.Model):
 
 class Comment(models.Model):
     """
-    Модель для комментария к посту.
-    Поля:
-    - author: Автор комментария (внешний ключ на модель пользователя).
-    - post: Пост, относящийся к комментарию (внешний ключ на модель поста).
-    - text: Текст комментария.
-    - created: Дата и время добавления комментария.
+    Model for a comment on a post.
+    Fields:
+    - author: Comment author (foreign key to the user model).
+    - post: Post related to the comment (foreign key to the post model).
+    - text: Comment text.
+    - created: Date and time when the comment was added.
     """
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='comments')
@@ -63,17 +63,15 @@ class Comment(models.Model):
         Post, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField()
     created = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
+        'Date added', auto_now_add=True, db_index=True)
 
 
 class Follow(models.Model):
     """
-    Модель для подписки пользователя на других пользователей.
-    Поля:
-    - user: Пользователь, который подписывается
-    (внешний ключ на модель пользователя).
-    - following: Пользователь, на которого подписываются
-    (внешний ключ на модель пользователя).
+    Model for a user following other users.
+    Fields:
+    - user: User who is following (foreign key to the user model).
+    - following: User being followed (foreign key to the user model).
     """
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='follower')
@@ -81,7 +79,7 @@ class Follow(models.Model):
         User, on_delete=models.CASCADE, related_name='following')
 
     class Meta:
-        # Уникальная комбинация полей
+        # Unique combination of fields
         unique_together = ('user', 'following')
 
     def __str__(self):
